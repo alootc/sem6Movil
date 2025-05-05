@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "Score Data", menuName = "ScriptableObjects/Player Data/Score Data", order = 1)]
@@ -8,6 +9,9 @@ public class ScoreData : ScriptableObject
     public Action<int> onHighScoreChanged;
     [SerializeField] private int currentScore;
     [SerializeField] private int highScore;
+
+    public int bestScore;
+    public List<int> scores = new List<int>();
 
     public int CurrentScore
     {
@@ -25,6 +29,35 @@ public class ScoreData : ScriptableObject
                 HighScore = currentScore;
             }
         }
+    }
+
+    public int GetScore()
+    {
+        int lastScore = currentScore;
+        scores.Add(currentScore);
+        currentScore = 0;
+
+        if (lastScore > bestScore)
+        {
+            bestScore = lastScore;
+            
+            NotificationManager.Instance.SendNotification(
+                "¡Nuevo Récord!",
+                $"Puntuación: {lastScore}",
+                0 
+            );
+        }
+        else
+        {
+            
+            NotificationManager.Instance.SendNotification(
+                "Partida Terminada",
+                $"Puntuación: {lastScore}",
+                0
+            );
+        }
+
+        return bestScore;
     }
 
     public int HighScore
